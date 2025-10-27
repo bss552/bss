@@ -21,11 +21,6 @@ local Config = {
             position = Vector3.new(-182, 20, -13),
             flightTime = 3.5
         },
-        ["2908818982"] = { -- 🌹 Rose Field
-            name = "Rose",
-            position = Vector3.new(-335, 19, 125),
-            flightTime = 3.5
-        },
         ["3835712489"] = { -- 🌶️ Pepper Field
             name = "Pepper",
             position = Vector3.new(-495, 123, 534),
