@@ -15,16 +15,6 @@ local Config = {
             name = "Mushroom",
             position = Vector3.new(-96, 4, 110),
             flightTime = 3.5
-        },
-        ["2908769330"] = { -- 🍓 Strawberry Field
-            name = "Strawberry",
-            position = Vector3.new(-182, 20, -13),
-            flightTime = 3.5
-        },
-        ["3835712489"] = { -- 🌶️ Pepper Field
-            name = "Pepper",
-            position = Vector3.new(-495, 123, 534),
-            flightTime = 3.5
         }
     },
     Settings = {
