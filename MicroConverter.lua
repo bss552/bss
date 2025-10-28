@@ -3,23 +3,6 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Функция проверки что игрок находится на поле (в зоне сбора)
-function isPlayerInField()
-    local character = Player.Character
-    if not character then return false end
-    
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRootPart then return false end
-    
-    -- Проверяем позицию игрока - на полях позиция обычно выше 0
-    local position = humanoidRootPart.Position
-    if position.Y < 10 then -- Если игрок под землей или в базе
-        return false
-    end
-    
-    return true
-end
-
 -- Функция для правильного парсинга чисел с запятыми
 function parseNumberWithCommas(str)
     if not str then return nil end
@@ -34,11 +17,6 @@ function isBackpack100PercentFull()
     local playerGui = Player:FindFirstChild("PlayerGui")
     if not playerGui then 
         return false 
-    end
-    
-    -- Проверяем что игрок находится на поле
-    if not isPlayerInField() then
-        return false
     end
     
     -- Ищем индикатор пыльцы в MeterHUD
@@ -115,13 +93,13 @@ while true do
     local deltaTime = currentTime - lastCheckTime
     lastCheckTime = currentTime
     
-    local isInField = isPlayerInField()
     local is100Percent = isBackpack100PercentFull()
     
-    if isInField and is100Percent then
+    -- Если рюкзак полный, увеличиваем таймер
+    if is100Percent then
         backpackFullTime = backpackFullTime + deltaTime
         
-        -- Активируем конвеер только если прошло 30 секунд и еще не активировали в этот цикл
+        -- Активируем конвеер только если прошло 30 секунд и еще не активировали
         if backpackFullTime >= cooldown and not hasPressed then
             local success = useMicroConverter()
             if success then
@@ -136,7 +114,7 @@ while true do
             end
         end
     else
-        -- Если игрок не на поле ИЛИ pollen не 100%, сбрасываем таймер
+        -- Если рюкзак не полный, сбрасываем таймер
         if backpackFullTime > 0 then
             backpackFullTime = 0
             hasPressed = false
