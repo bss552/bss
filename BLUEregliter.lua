@@ -23,8 +23,8 @@ local Config = {
         },
         ["2908768829"] = { -- Bamboo
             name = "Bamboo",
-            position = Vector3.new(116.43, 20.00, -21.75),
-            flightTime = 3
+            position = Vector3.new(-332.0, 68.00, -194.90),
+            flightTime = 4
         }
     },
     Settings = {
