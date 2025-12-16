@@ -11,9 +11,9 @@ local rootPart = character:WaitForChild("HumanoidRootPart")
 local Config = {
     GlitterArgs = { { Name = "Glitter" } },
     Fields = {
-        ["2908769124"] = { -- 🍄 Mushroom Field
+        ["2908769124"] = { -- Mushroom Field
             name = "Mushroom",
-            position = Vector3.new(-96, 4, 110),
+            position = Vector3.new(-118, 3, 135),
             flightTime = 3.5
         }
     },
@@ -31,7 +31,7 @@ local isFlying = false
 
 -- Логирование
 local function Log(message)
-    print("[FLIGHT SYSTEM]: " .. os.date("%H:%M:%S") .. " | " .. message)
+    print("[FLIGHT SYSTEM]: "..os.date("%H:%M:%S").." | "..message)
 end
 
 -- Плавный полет с защитой
@@ -39,85 +39,71 @@ local function SmoothFlight(targetPosition, duration)
     if isFlying then return false end
     isFlying = true
     
+    -- Фиксация начальной позиции
     local startPos = rootPart.Position
     local startTime = tick()
+    local endTime = startTime + duration
     
+    -- Создаем соединение для плавного перемещения
     local connection
     connection = RunService.Heartbeat:Connect(function()
         local currentTime = tick()
         local progress = math.min(1, (currentTime - startTime) / duration)
         
+        -- Плавное перемещение
+        rootPart.CFrame = CFrame.new(
+            startPos:Lerp(targetPosition, progress),
+            targetPosition
+        )
+        
+        -- Завершение полета
         if progress >= 1 then
             connection:Disconnect()
             isFlying = false
-            rootPart.CFrame = CFrame.new(targetPosition)
-        else
-            rootPart.CFrame = CFrame.new(startPos:Lerp(targetPosition, progress))
         end
     end)
     
-    task.wait(duration)
-    if connection then
-        connection:Disconnect()
-    end
-    isFlying = false
+    -- Ожидаем завершения
+    repeat task.wait() until tick() >= endTime
+    if connection then connection:Disconnect() end
     return true
 end
 
 -- Основная функция буста
 local function UseBoost(boostData)
-    Log("Начинаю полет на " .. boostData.name)
-    
     -- Плавный полет
-    local success = SmoothFlight(boostData.position, boostData.flightTime)
+    Log("Начинаю полет на "..boostData.name)
+    SmoothFlight(boostData.position, boostData.flightTime)
     
-    if success then
-        -- Фиксация после прилета
-        rootPart.Anchored = true
-        Log("Прибыл на поле, фиксирую позицию")
-        
-        -- Использование Glitter
-        local glitterSuccess = pcall(function()
-            GlitterEvent:FireServer(unpack(Config.GlitterArgs))
-        end)
-        
-        if glitterSuccess then
-            Log("Glitter успешно использован")
-        else
-            Log("Ошибка при использовании Glitter")
-        end
-        
-        -- Ожидание перед разблокировкой
-        task.wait(Config.Settings.FreezeAfter)
-        rootPart.Anchored = false
-        Log("Завершено")
-    else
-        Log("Ошибка полета")
-    end
+    -- Фиксация после прилета
+    rootPart.Anchored = true
+    Log("Прибыл на поле, фиксирую позицию")
+    
+    -- Использование Glitter
+    pcall(function()
+        GlitterEvent:FireServer(unpack(Config.GlitterArgs))
+        Log("Glitter успешно использован")
+    end)
+    
+    -- Ожидание перед разблокировкой
+    task.wait(Config.Settings.FreezeAfter)
+    rootPart.Anchored = false
+    Log("Завершено")
 end
 
 -- Сканер бустов
 local function ScanBoosts()
-    local success, gui = pcall(function()
-        return player:WaitForChild("PlayerGui")
-    end)
-    
-    if not success then
-        return
-    end
-    
+    local gui = player:WaitForChild("PlayerGui")
     for _, element in ipairs(gui:GetDescendants()) do
         if element:IsA("ImageButton") and not element:FindFirstChild("Processed") then
-            local image = tostring(element.Image)
-            local id = image:match("rbxassetid://(%d+)")
-            
+            local id = tostring(element.Image):match("rbxassetid://(%d+)")
             if id and Config.Fields[id] and not ActiveBoosts[id] then
                 local marker = Instance.new("BoolValue")
                 marker.Name = "Processed"
                 marker.Parent = element
                 
                 ActiveBoosts[id] = true
-                Log("Обнаружен буст: " .. Config.Fields[id].name)
+                Log("Обнаружен буст: "..Config.Fields[id].name)
                 
                 task.delay(Config.Settings.WaitTime, function()
                     UseBoost(Config.Fields[id])
@@ -131,14 +117,11 @@ end
 -- Обработчик респавна
 player.CharacterAdded:Connect(function(newChar)
     character = newChar
-    rootPart = newChar:WaitForChild("HumanoidRootPart")
+    rootPart = character:WaitForChild("HumanoidRootPart")
 end)
 
 -- Главный цикл
 while true do
-    local success, error = pcall(ScanBoosts)
-    if not success then
-        warn("Ошибка в ScanBoosts: " .. tostring(error))
-    end
+    pcall(ScanBoosts)
     task.wait(Config.Settings.ScanDelay)
 end
