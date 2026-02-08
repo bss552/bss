@@ -1,7 +1,7 @@
 -- [[ ОБЪЕДИНЕННЫЙ СКРИПТ: Bss Edition (PRIORITY FIX) ]]
 
 local CHANNEL_ID = "" -- Ростки
-local DISCORD_TOKEN = "MTE0NTAzNTYwNDU3MzMwNjk2MQ.GrBSwc.LyoELRPJwuy4pzWjsAXxv9UVTeDE5RvypTfHzA"
+local DISCORD_TOKEN = "ODc1NzY2NDg2MjYwNjcwNDc0.GXVCL4.v1qPNYJ0fkbYIOp_OhyFaBSSQFYJn9fe1pYoPk"
 local TARGET_CHANNEL = "" -- Вициусы
 local STICK_CHANNEL = "1408759427619618850" -- СТИК БАГ
 
